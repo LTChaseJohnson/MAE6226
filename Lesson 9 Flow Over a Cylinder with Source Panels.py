@@ -61,4 +61,27 @@ plt.legend(['Cylinder','Panels','End Points','Center Points'],loc='best',prop={'
 plt.xlim(-R-.1,R+.1)
 plt.ylim(-R-.1,R+.1)
 
+# Evaluating integral for flow boundary conditions
+def I(pi,pj):
+    def func(s):
+        return ((pi.xc-(pj.xa-sin(pj.beta)*s))*cos(pi.beta)+(pi.yc-(pj.ya+cos(pj.beta)*s))*sin(pi.beta))\
+        /((pi.xc-(pj.xa-sin(pj.beta)*s))**2+(pi.yc-pj.ya+cos(pj.beta)*s))**2)
+    return integrate.quad(lambda s:func(s),0.,pj.length)[0]
+    
+# Setting up System of Equaitons as vectors
+A = np.empty((Np,Np),dtype=float)
+for i in range(Np):
+    for j in range(Np):
+        if (i!=j):
+            A[i,j] = 0.5/pi * I(panel[i],panel[j])
+        else:
+            A[i,j] = 0.5
+
+b = =Uinf*np.cos([p.beta for p in panel])
+
+# Solving Vector Equations
+var = np.linalg.solve(A,b)
+for i in range(len(panel)):
+    panel[i].sigma = var[j]
+
 plt.show()
