@@ -29,8 +29,8 @@ class Panel:
         self.length = np.sqrt((xb-xa)**2+(yb-ya)**2)
         
         # Panel orientation
-        if (xb-xa<=0.): self.beta = np.acos((yb-ya)/self.length)
-        elif (xb-xa>0.): self.beta = pi + np.acos((yb-ya)/self.length)
+        if (xb-xa<=0.): self.beta = acos((yb-ya)/self.length)
+        elif (xb-xa>0.): self.beta = pi + acos((yb-ya)/self.length)
         
         self.sigma = 0.            # Initializes Sheet Strength
         self.Vt = 0.               # Initializes Tangential Velocity
@@ -46,6 +46,19 @@ panel = np.empty(Np,dtype=object)                  # Creating empty panel shell
 for i in range(Np):
     panel[i] = Panel(xb[i],yb[i],xb[i+1],yb[i+1])  # Storing panel information
     
-
+# Creating Plot of Panels
+size = 6
+plt.figure(num=2,figsize=(size,size))
+plt.grid(True)
+plt.xlabel('x',fontsize=16)
+plt.ylabel('y',fontsize=16)
+plt.title('Cylinder Panels')
+plt.plot(xb,yb,c='#FF0000',ls='-',lw=2)
+plt.plot(xCylinder,yCylinder,c='#00FF00', ls='-',lw=1)
+plt.scatter([p.xa for p in panel],[p.ya for p in panel],c='#FF0000',s=40)
+plt.scatter([p.xc for p in panel],[p.yc for p in panel],c='#00FF00',s=40)
+plt.legend(['Cylinder','Panels','End Points','Center Points'],loc='best',prop={'size':16})
+plt.xlim(-R-.1,R+.1)
+plt.ylim(-R-.1,R+.1)
 
 plt.show()
