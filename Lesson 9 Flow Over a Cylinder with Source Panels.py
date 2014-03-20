@@ -133,4 +133,9 @@ x = np.linspace(-2*R,2*R,N)
 y = np.linspace(-2*R,2*R,N)
 X,Y = np.meshgrid(x,y)
 
+# Integral function for U
+def :
+    def func(s):
+        return (X-
+
 plt.show()
