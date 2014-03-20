@@ -82,6 +82,6 @@ b = =Uinf*np.cos([p.beta for p in panel])
 # Solving Vector Equations
 var = np.linalg.solve(A,b)
 for i in range(len(panel)):
-    panel[i].sigma = var[j]
+    panel[i].sigma = var[i]
 
 plt.show()
