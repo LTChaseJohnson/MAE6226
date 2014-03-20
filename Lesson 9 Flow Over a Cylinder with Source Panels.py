@@ -30,7 +30,7 @@ class Panel:
         
         # Panel orientation
         if (xb-xa<=0.): self.beta = acos((yb-ya)/self.length)
-        elif (xb-xa>0.): self.beta = pi + acos((yb-ya)/self.length)
+        elif (xb-xa>0.): self.beta = pi + acos(-(yb-ya)/self.length)
         
         self.sigma = 0.            # Initializes Sheet Strength
         self.Vt = 0.               # Initializes Tangential Velocity
@@ -64,8 +64,8 @@ plt.ylim(-R-.1,R+.1)
 # Evaluating integral for Velocity Field
 def I(pi,pj):
     def func(s):
-        return ((pi.xc-(pj.xa-sin(pj.beta)*s))*cos(pi.beta)+(pi.yc-(pj.ya+cos(pj.beta)*s))*sin(pi.beta))\
-        /((pi.xc-(pj.xa-sin(pj.beta)*s))**2+(pi.yc-pj.ya+cos(pj.beta)*s))**2)
+        return (+(pi.xc-(pj.xa-sin(pj.beta)*s))*cos(pi.beta)+(pi.yc-(pj.ya+cos(pj.beta)*s))*sin(pi.beta))\
+        /((pi.xc-(pj.xa-sin(pj.beta)*s))**2+(pi.yc-(pj.ya+cos(pj.beta)*s))**2)
     return integrate.quad(lambda s:func(s),0.,pj.length)[0]
     
 # Setting up System of Equations as vectors
@@ -77,26 +77,60 @@ for i in range(Np):
         else:
             A[i,j] = 0.5
 
-b = =Uinf*np.cos([p.beta for p in panel])
+b = -Uinf*np.cos([p.beta for p in panel])
 
 # Solving Vector Equations
 var = np.linalg.solve(A,b)
 for i in range(len(panel)):
     panel[i].sigma = var[i]
 
-# Evaluating integral for Pressure Coefficient
+# Solving for Tangential Velocity (Vt):
 def F(pi,pj):
     def func(s):
         return (-(pi.xc-(pj.xa-sin(pj.beta)*s))*sin(pi.beta)+(pi.yc-(pj.ya+cos(pj.beta)*s))*cos(pi.beta))\
         /((pi.xc-(pj.xa-sin(pj.beta)*s))**2+(pi.yc-(pj.ya+cos(pj.beta)*s))**2)
     return integrate.quad(lambda s:func(s),0.,pj.length)[0]
 
-# Setting up System of Equations as vectors
+# Establishing a system of equations for Vt
+
+# Defining integral term as A
 A = np.zeros((Np,Np),dtype=float)
 for i in range(Np):
     for j in range(Np):
         if (i!=j):
-            A[i,j] = (0.5/pi)
+            A[i,j] = (0.5/pi)*F(panel[i],panel[j])
 
+# Defining Freestream term as B
+B = -Uinf*np.sin([p.beta for p in panel])
+
+# Defining Strength term as sigma
+sigma = np.array([p.sigma for p in panel])
+
+# Establishing complete equation
+Vt = np.dot(A,sigma) + B
+
+# Creating Vt Panel
+for i in range(Np):
+    panel[i].Vt = Vt[i]
+
+# Solving for Pressure Coefficient (Cp):
+for i in range(Np):
+    panel[i].Cp = 1 - (panel[i].Vt/Uinf)**2
+
+# Plotting Cp
+plt.figure(3,figsize=(10,6))
+plt.grid(True)
+plt.xlabel('x',fontsize=16)
+plt.ylabel(r'$C_p$',fontsize=16)
+plt.plot(xCylinder,1-4*(yCylinder/R)**2,c='b',ls='-',lw=1,zorder=1)
+plt.scatter([p.xc for p in panel],[p.Cp for p in panel],c='k',zorder=2)
+plt.title('Number of Panels: %d'%len(panel))
+plt.legend(['analytical','source panel method'],loc='best',prop={'size':16})
+
+# Creating Meshgrid
+N = 200
+x = np.linspace(-2*R,2*R,N)
+y = np.linspace(-2*R,2*R,N)
+X,Y = np.meshgrid(x,y)
 
 plt.show()
