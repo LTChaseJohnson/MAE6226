@@ -19,6 +19,7 @@ plt.ylabel('y',fontsize = 16)
 plt.xlim(xStart,xEnd)
 plt.ylim(yStart,yEnd)
 plt.plot(xp,yp,'k-',linewidth = 2)
+plt.axis("equal")
 
 class Panel:
     def __init__(self,xa,ya,xb,yb):
@@ -76,6 +77,7 @@ plt.xlabel('x',fontsize = 16)
 plt.ylabel('y',fontsize = 16)
 plt.plot(xp,yp,'k-',linewidth=2)
 plt.plot(np.append([p.xa for p in panel],panel[0].xa), np.append([p.ya for p in panel],panel[0].ya),linestyle = '-', linewidth = 1, marker = 'o', markersize = 6, color = '#FF0000')
+plt.axis("equal")
 
 class Freestream:
 	def __init__(self,Uinf,alpha):
@@ -155,6 +157,7 @@ plt.xlim(xStart,xEnd)
 plt.ylim(yStart,yEnd)
 plt.gca().invert_yaxis()
 plt.title('Number of panels : %d'%len(panel));
+plt.axis("equal")
 
 def getVelocityField(panel,freestream,X,Y):
     Nx,N = X.shape
@@ -185,4 +188,21 @@ plt.xlim(xStart,xEnd)
 plt.ylim(yStart,yEnd)
 plt.title('Contour of velocity field')
 plt.axis("equal")
+
+Cp = 1.0-(u**2+v**2)/freestream.Uinf**2
+
+size = 12
+plt.figure(figsize=(size,(yEnd-yStart)/(xEnd-xStart)*size))
+plt.xlabel('x',fontsize=16)
+plt.ylabel('y',fontsize=16)
+contf = plt.contourf(X,Y,Cp,levels = np.linspace(-2.0,1.0,100),extend='both')
+cbar = plt.colorbar(contf)
+cbar.set_label('$C_p$',fontsize=16)
+cbar.set_ticks([-2.0,-1.0,0.0,1.0])
+plt.fill([p.xa for p in panel],[p.ya for p in panel], 'ko-', linewidth=2,zorder=2)
+plt.xlim(xStart,xEnd)
+plt.ylim(yStart,yEnd)
+plt.title('Contour of Pressure Field')
+plt.axis("equal")
+
 plt.show()
