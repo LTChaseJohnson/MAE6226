@@ -84,6 +84,12 @@ Uinf = input('Enter Freestream velocity: ')
 alpha = input('Enter angle of attack: ')
 freestream = Freestream(Uinf,alpha)
 
+def I(xci,yci,pj,dxdz,dydz):
+    def func(s):
+        return (+(xci-(pj.xa-sin(pj.beta)*s))*dxdz+(yci-(pj.ya+cos(pj.beta)*s))*dydz)\
+        /((xci-(pj.xa-sin(pj.beta)*s))**2+(yci-(pj.ya+cos(pj.beta)*s))**2)
+        return integrate.quad(lambda s:func(s),0.,pj.length)[0]
+
 
 
 plt.show()
