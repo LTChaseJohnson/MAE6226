@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from scipy import integrate
 from math import *
 
-coords = np.loadtxt('C:/Users/chasevjohnson/Downloads/n0012.dat')
+coords = np.loadtxt(fname='C:/Users/chasevjohnson/Downloads/n0012.dat')
 xp,yp = coords[:,0],coords[:,1]
 
 valX,valY = 01,0.2
@@ -64,11 +64,12 @@ def definePanels(N,xp,yp):
 N = input('Enter number of panels: ')
 panel = definePanels(N,xp,yp)
 
-xmin2,xmax2 = min([p.xa for p in panel]),max([p.xa for p in panel])
-ymin2,ymax2 = min([p.ya for p in panel]),max([p.ya for p in panel])
-xStart2,xEnd2 = xmin2-valX*(xmax2-xmin2),xmax2+valX*(xmax2-xmin2)
-yStart2,yEnd2 = ymin2-valY*(ymax2-ymin2),ymax2+valY*(ymax2-ymin2)
-plt.figure(figsize=(size,(yEnd2-yStart2)/(xEnd2-xStart2)*size))
+valX,valY = 0.1,0.2
+xmin,xmax = min([p.xa for p in panel]),max([p.xa for p in panel])
+ymin,ymax = min([p.ya for p in panel]),max([p.ya for p in panel])
+xStart,xEnd = xmin-valX*(xmax-xmin),xmax+valX*(xmax-xmin)
+yStart,yEnd = ymin-valY*(ymax-ymin),ymax+valY*(ymax-ymin)
+plt.figure(figsize=(size,(yEnd-yStart)/(xEnd-xStart)*size))
 plt.grid(True)
 plt.xlabel('x',fontsize = 16)
 plt.ylabel('y',fontsize = 16)
@@ -76,34 +77,33 @@ plt.plot(xp,yp,'k-',linewidth=2)
 plt.plot(np.append([p.xa for p in panel],panel[0].xa), np.append([p.ya for p in panel],panel[0].ya),linestyle = '-', linewidth = 1, marker = 'o', markersize = 6, color = '#FF0000')
 
 class Freestream:
-    def __init__(self,Uinf,alpha):
-        self.Uinf = Uinf
-        self.alpha = alpha*pi/180
+	def __init__(self,Uinf,alpha):
+		self.Uinf = Uinf                   
+		self.alpha = alpha*pi/180
 
 Uinf = input('Enter Freestream velocity: ')
 alpha = input('Enter angle of attack: ')
 freestream = Freestream(Uinf,alpha)
 
 def I(xci,yci,pj,dxdz,dydz):
-    def func(s):
-        return (+(xci-(pj.xa-sin(pj.beta)*s))*dxdz+(yci-(pj.ya+cos(pj.beta)*s))*dydz)\
-        /((xci-(pj.xa-sin(pj.beta)*s))**2+(yci-(pj.ya+cos(pj.beta)*s))**2)
-    return integrate.quad(lambda s:func(s),0.,pj.length)[0]
+	def func(s):
+		return (+(xci-(pj.xa-sin(pj.beta)*s))*dxdz+(yci-(pj.ya+cos(pj.beta)*s))*dydz)/((xci-(pj.xa-sin(pj.beta)*s))**2 + (yci-(pj.ya+cos(pj.beta)*s))**2)
+	return integrate.quad(lambda s:func(s),0.,pj.length)[0]
 
 def buildMatrix(p):
-    L = len(p)
+    N = len(p)
     A = np.empty((N,N),dtype=float)
     np.fill_diagonal(A,0.5)
-    for i in range(L):
-        for j in range(L):
+    for i in range(N):
+        for j in range(N):
             if (i!=j):
                 A[i,j] = 0.5/pi*I(p[i].xc,p[i].yc,p[j],cos(p[i].beta),sin(p[i].beta))
     return A
 
 def buildRHS(p,fs):
-    L = len(p)
+    N = len(p)
     B = np.zeros(N,dtype=float)
-    for i in range(L):
+    for i in range(N):
         B[i] = -fs.Uinf*cos(fs.alpha-p[i].beta)
     return B
 
@@ -115,17 +115,17 @@ for i in range(len(panel)):
     panel[i].sigma = var[i]
 
 def getTangentVelocity(p,fs,gamma):
-    L = len(p)
-    A = np.zeros((N,N),dtype=float)
-    for i in range(L):
-        for j in range(L):
-            if (i!=j):
-                A[i,j] = 0.5/pi*I(p[i].xc,p[i].yc,p[j],-sin(p[i].beta),cos(p[i].beta))
-    B = fs.Uinf*np.sin([fs.alpha-pp.beta for pp in p])
-    var = np.array([pp.sigma for pp in p])
-    vt = np.dot(A,var)+B
-    for i in range(L):
-        p[i].vt=vt[i]
+	N = len(p)
+	A = np.zeros((N,N),dtype=float)
+	for i in range(N):
+		for j in range(N):
+			if (i!=j):
+				A[i,j] = 0.5/pi*I(p[i].xc,p[i].yc,p[j],-sin(p[i].beta),cos(p[i].beta))
+	B = fs.Uinf*np.sin([fs.alpha-pp.beta for pp in p])
+	var = np.array([pp.sigma for pp in p])
+	vt = np.dot(A,var)+B
+	for i in range(N):
+		p[i].vt = vt[i]
         
 def getPressureCoefficient(p,fs):
     for i in range(len(p)):
@@ -133,16 +133,16 @@ def getPressureCoefficient(p,fs):
 
 getPressureCoefficient(panel,freestream)
 
-xmin3,xmax3 = min([p.xa for p in panel]),max([p.xa for p in panel])
+valX,valY = 0.1,0.2
+xmin,xmax = min([p.xa for p in panel]),max([p.xa for p in panel])
 Cpmin,Cpmax = min([p.Cp for p in panel]),max([p.Cp for p in panel])
-xStart3,xEnd3 = xmin3-valX*(xmax3-xmin3),xmax3+valX*(xmax3-xmin3)
-yStart3,yEnd3 = Cpmin-valY*(Cpmax-Cpmin),Cpmax+valY*(Cpmax-Cpmin)
+xStart,xEnd = xmin-valX*(xmax-xmin),xmax+valX*(xmax-xmin)
+yStart,yEnd = Cpmin-valY*(Cpmax-Cpmin),Cpmax+valY*(Cpmax-Cpmin)
 plt.figure(figsize=(10,6))
 plt.grid(True)
 plt.xlabel('x',fontsize=16)
 plt.ylabel('$C_p$',fontsize=16)
-plt.plot([p.xc for p in panel if p.loc=='Top'],\
-		[p.Cp for p in panel if p.loc=='Top'],\
+plt.plot([p.xc for p in panel if p.loc=='Top'],[p.Cp for p in panel if p.loc=='Top'],\
 		'ro-',linewidth=2)
 plt.plot([p.xc for p in panel if p.loc=='Bottom'],\
 		[p.Cp for p in panel if p.loc=='Bottom'],\
