@@ -90,6 +90,30 @@ def I(xci,yci,pj,dxdz,dydz):
         /((xci-(pj.xa-sin(pj.beta)*s))**2+(yci-(pj.ya+cos(pj.beta)*s))**2)
         return integrate.quad(lambda s:func(s),0.,pj.length)[0]
 
+def buildMatrix(p):
+    L = len(p)
+    A = np.empty((N,N),dtype=float)
+    np.fill_diagonal(A,0.5)
+    for i in range(L):
+        for j in range(L):
+            if (i!=j):
+                A[i,j] = 0.5/pi*I(p[i].xc,p[i].yc,p[j],cos(p[i].beta),sin(p[i].beta))
+    return A
+
+def buildRHS(p,fs):
+    L = len(p)
+    B = np.zeros(N,dtype=float)
+    for i in range(L):
+        B[i] = -fs.Unf*cos(fs.alpha-p[i].beta)
+    return B
+
+A = buildMatrix(panel)
+B = buildRHS(panel,freestream)
+
+var = np.linalg.solve(A,B)
+for i in range(len(panel)):
+    panel[i].sigma = var[i]
+
 
 
 plt.show()
