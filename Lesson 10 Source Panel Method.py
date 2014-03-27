@@ -120,13 +120,37 @@ def getTangentVelocity(p,fs,gamma):
     for i in range(L):
         for j in range(L):
             if (i!=j):
-                A[i,j] = 0.5/pi*I(p[i].xc,p[i].yc,p[j],-sin(p[i].beta),cos(p[i].beta))
+                A[i,j] = (0.5/pi)*I(p[i].xc,p[i].yc,p[j],-sin(p[i].beta),cos(p[i].beta))
     B = fs.Uinf*np.sin([fs.alpha-pp.beta for pp in p])
     var = np.array([pp.sigma for pp in p])
     vt = np.dot(A,var)+B
     for i in range(L):
         p[i].vt=vt[i]
         
+def getPressureCoefficient(p,fs):
+    for i in range(len(p)):
+        p[i].Cp = 1-(p[i].vt/fs.Uinf)**2
 
+getPressureCoefficient(panel,freestream)
+
+xmin3,xmax3 = min([p.xa for p in panel]),max([p.xa for p in panel])
+Cpmin,Cpmax = min([p.Cp for p in panel]),max([p.Cp for p in panel])
+xStart3,xEnd3 = xmin3-valX*(xmax3-xmin3),xmax3+valX*(xmax3-xmin3)
+yStart3,yEnd3 = Cpmin-valY*(Cpmax-Cpmin),Cpmax+valY*(Cpmax-Cpmin)
+plt.figure(figsize=(10,6))
+plt.grid(True)
+plt.xlabel('x',fontsize=16)
+plt.ylabel('$C_p$',fontsize=16)
+plt.plot([p.xc for p in panel if p.loc=='Top'],\
+		[p.Cp for p in panel if p.loc=='Top'],\
+		'ro-',linewidth=2)
+plt.plot([p.xc for p in panel if p.loc=='Bottom'],\
+		[p.Cp for p in panel if p.loc=='Bottom'],\
+		'bo-',linewidth=1)
+plt.legend(['Top','Bottom'],'best',prop={'size':14})
+plt.xlim(xStart,xEnd)
+plt.ylim(yStart,yEnd)
+plt.gca().invert_yaxis()
+plt.title('Number of panels : %d'%len(panel));
 
 plt.show()
