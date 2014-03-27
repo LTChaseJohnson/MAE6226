@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from scipy import integrate
 from math import *
 
-coords = np.loadtxt('C:/Users/Chase/Dropbox/Graduate_School/AeroDynamics/Python/n0012.dat')
+coords = np.loadtxt('C:/Users/chasevjohnson/Downloads/n0012.dat')
 xp,yp = coords[:,0],coords[:,1]
 
 valX,valY = 01,0.2
@@ -88,7 +88,7 @@ def I(xci,yci,pj,dxdz,dydz):
     def func(s):
         return (+(xci-(pj.xa-sin(pj.beta)*s))*dxdz+(yci-(pj.ya+cos(pj.beta)*s))*dydz)\
         /((xci-(pj.xa-sin(pj.beta)*s))**2+(yci-(pj.ya+cos(pj.beta)*s))**2)
-        return integrate.quad(lambda s:func(s),0.,pj.length)[0]
+    return integrate.quad(lambda s:func(s),0.,pj.length)[0]
 
 def buildMatrix(p):
     L = len(p)
@@ -104,7 +104,7 @@ def buildRHS(p,fs):
     L = len(p)
     B = np.zeros(N,dtype=float)
     for i in range(L):
-        B[i] = -fs.Unf*cos(fs.alpha-p[i].beta)
+        B[i] = -fs.Uinf*cos(fs.alpha-p[i].beta)
     return B
 
 A = buildMatrix(panel)
