@@ -120,7 +120,7 @@ def getTangentVelocity(p,fs,gamma):
     for i in range(L):
         for j in range(L):
             if (i!=j):
-                A[i,j] = (0.5/pi)*I(p[i].xc,p[i].yc,p[j],-sin(p[i].beta),cos(p[i].beta))
+                A[i,j] = 0.5/pi*I(p[i].xc,p[i].yc,p[j],-sin(p[i].beta),cos(p[i].beta))
     B = fs.Uinf*np.sin([fs.alpha-pp.beta for pp in p])
     var = np.array([pp.sigma for pp in p])
     vt = np.dot(A,var)+B
