@@ -114,6 +114,19 @@ var = np.linalg.solve(A,B)
 for i in range(len(panel)):
     panel[i].sigma = var[i]
 
+def getTangentVelocity(p,fs,gamma):
+    L = len(p)
+    A = np.zeros((N,N),dtype=float)
+    for i in range(L):
+        for j in range(L):
+            if (i!=j):
+                A[i,j] = 0.5/pi*I(p[i].xc,p[i].yc,p[j],-sin(p[i].beta),cos(p[i].beta))
+    B = fs.Uinf*np.sin([fs.alpha-pp.beta for pp in p])
+    var = np.array([pp.sigma for pp in p])
+    vt = np.dot(A,var)+B
+    for i in range(L):
+        p[i].vt=vt[i]
+        
 
 
 plt.show()
