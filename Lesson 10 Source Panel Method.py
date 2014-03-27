@@ -75,4 +75,15 @@ plt.ylabel('y',fontsize = 16)
 plt.plot(xp,yp,'k-',linewidth=2)
 plt.plot(np.append([p.xa for p in panel],panel[0].xa), np.append([p.ya for p in panel],panel[0].ya),linestyle = '-', linewidth = 1, marker = 'o', markersize = 6, color = '#FF0000')
 
+class Freestream:
+    def __init__(self,Uinf,alpha):
+        self.Uinf = Uinf
+        self.alpha = alpha*pi/180
+
+Uinf = input('Enter Freestream velocity: ')
+alpha = input('Enter angle of attack: ')
+freestream = Freestream(Uinf,alpha)
+
+
+
 plt.show()
