@@ -6,7 +6,7 @@ from math import *
 coords = np.loadtxt(fname='C:/Users/chasevjohnson/Downloads/n0012.dat')
 xp,yp = coords[:,0],coords[:,1]
 
-valX,valY = 01,0.2
+valX,valY = 0.1,0.2
 xmin,xmax = min(xp),max(xp)
 ymin,ymax = min(yp),max(yp)
 xStart,xEnd = xmin-valX*(xmax-xmin),xmax+valX*(xmax-xmin)
@@ -38,6 +38,7 @@ class Panel:
         self.Cp = 0.
 
 def definePanels(N,xp,yp):
+    
     R = (max(xp)-min(xp))/2
     xc,yc = (max(xp)+min(xp))/2,(max(yp)+min(yp))/2
     xCircle = xc + R*np.cos(np.linspace(0,2*pi,N+1))
@@ -45,7 +46,7 @@ def definePanels(N,xp,yp):
     
     x = np.copy(xCircle[0:-1])
     y = np.empty_like(x)
-    
+
     I = 0
     for i in range(N):
         while (I<len(xp)-1):
@@ -54,11 +55,11 @@ def definePanels(N,xp,yp):
         a = (yp[(I+1)%len(yp)]-yp[I])/(xp[(I+1)%len(yp)]-xp[I])
         b = yp[(I+1)%len(yp)]-a*xp[(I+1)%len(xp)]
         y[i] = a*x[i]+b
-        
+    
     panel = np.empty(N,dtype=object)
     for i in range(N):
         panel[i] = Panel(x[i],y[i],x[(i+1)%N],y[(i+1)%N])
-        
+    
     return panel
 
 N = input('Enter number of panels: ')
@@ -112,9 +113,9 @@ B = buildRHS(panel,freestream)
 
 var = np.linalg.solve(A,B)
 for i in range(len(panel)):
-    panel[i].sigma = var[i]
+	panel[i].sigma = var[i]
 
-def getTangentVelocity(p,fs,gamma):
+def getTangentVelocity(p,fs):
 	N = len(p)
 	A = np.zeros((N,N),dtype=float)
 	for i in range(N):
@@ -125,8 +126,10 @@ def getTangentVelocity(p,fs,gamma):
 	var = np.array([pp.sigma for pp in p])
 	vt = np.dot(A,var)+B
 	for i in range(N):
-		p[i].vt = vt[i]
-        
+		p[i].vt = vt[i]	
+			
+getTangentVelocity(panel,freestream)
+     
 def getPressureCoefficient(p,fs):
     for i in range(len(p)):
         p[i].Cp = 1-(p[i].vt/fs.Uinf)**2
