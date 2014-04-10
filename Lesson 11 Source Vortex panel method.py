@@ -22,4 +22,27 @@ plt.ylabel('y',fontsize = 16)
 plt.xlim(xStart,xEnd)
 plt.ylim(yStart,yEnd)
 plt.plot(xp,yp,'k-',linewidth=2)
+
+#Defining panel class
+class Panel:
+    def __init__(self,xa,ya,xb,yb):
+        self.xa,self.ya = xa,ya                       #First endpoint of panel
+        self.xb,self.yb = xb,yb                       #Second endpoint of panel
+        self.xc,self.yc = sqrt((xb-xa)**2+(yb-ya)**2) #Control center point
+        
+        #Sets the orientation of the panel
+        if (xb-xa<=0.): self.beta = acos((yb-a)/self.length)
+        elif (xb-xa>0/): self.beta = pi+acos(-(yb-a)/self.length)
+        
+        #Sets the location of the panel
+        if (self.beta<=pi): self.loc = 'Top Surface'
+        else: self.loc = 'Bottom Surface'
+        
+        self.sigma = 0.                             #Creating initial source
+        self.vt = 0.                                #Creating initial tangent velocity
+        self.Cp = 0.                                #Creating initial pressure coeff
+        
+
+
+
 plt.show()
