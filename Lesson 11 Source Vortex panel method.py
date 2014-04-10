@@ -23,7 +23,7 @@ plt.xlim(xStart,xEnd)
 plt.ylim(yStart,yEnd)
 plt.plot(xp,yp,'k-',linewidth=2)
 
-#Defining panel class
+# Defining panel class
 class Panel:
     def __init__(self,xa,ya,xb,yb):
         self.xa,self.ya = xa,ya                       #First endpoint of panel
@@ -42,6 +42,33 @@ class Panel:
         self.vt = 0.                                #Creating initial tangent velocity
         self.Cp = 0.                                #Creating initial pressure coeff
         
+# Creating discrete panels for imported geometry
+def definePanels(N,xp,yp):
+    R = (max(xp)-min(xp))/2
+    xCenter = (max(xp)+min(xp))/2
+    xCircle = xCenter +R*np.cos(np.linspace(0,2*pi,N+1))
+    
+    x = np.copy(xCircle)
+    y = np.empty_like(x)
+    
+    xp,yp = np.append(xp,xp[0]),np.append(yp,yp[0])
+    
+    I = 0
+    for i in range(N):
+        while (I<len(xp)-1):
+            if (xp[I]<=x[i]<=xp[I+1] or xp[I+1]<=x[i]<=xp[I]): break
+            else: I += 1
+        a = (p[I+1]-yp[I])/(xp[I+1]-xp[I])
+        b = yp[I+1]-a*xp[I+1]
+        y[i] = a*x[i]+b
+    y[N] = y[0]
+    
+    panel = np.empy(N,dype=object)
+    for i in range(N):
+        panel[i] = Panel(x[i],y[i],x[i+1],y[i+1])
+    
+    return panel
+
 
 
 
