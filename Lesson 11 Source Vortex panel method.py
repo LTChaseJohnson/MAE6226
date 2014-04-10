@@ -88,4 +88,35 @@ plt.ylim(yStart,yEnd)
 plt.plot(xp,yp,'k-',linewidth=2)
 plt.plot(np.append([p.xa for p in panel],panel[0].xa),np.append([p.ya for p in panel],panel[0].ya),'r-',linewidth=1,marker='o',markersize=6)
 
+# Creating Freestream Conditions
+class Freestream:
+    def __init__(self,Uinf,alpha):
+        self.Uinf=Uinf
+        self.alpha = alpha*pi/180
+
+Uinf = input('Enter freestream velocity: ')
+alpha = input('Enter angle of attack: ')
+freesream = Freestream(Uinf,alpha)
+
+# Creating integral function
+def I(xci,yci,pj,dxdz,dydz):
+    def func(s):
+        return (+(xci-(pj.xa-sin(pj.beta)*s))*dxdz\
+        +(yci-(pj.ya+cos(pj.beta)*s))*dydz)\
+        /((xci-(pj.xa-sin(pj.beta)*s))**2)
+    return integrate.quad(lamda s:func(s),0.,pj.length)[0]
+
+# Defining the sources on the panels
+def sourceMatrix(p):
+    N = len(p)
+    A = np.empty((N,N),dtype=float)
+    np.fill_diagonal(A,0.5)
+    for i in range(N):
+        for j in range(N):
+            if (i!=j):
+                A[i,j]= 0.5/pi*I(p[i].xc,p[i].yc,p[j],+cos([p[i].beta),+sin(p[i].beta))
+    return A
+
+
+
 plt.show()
