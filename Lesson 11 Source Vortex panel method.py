@@ -127,6 +127,20 @@ def vortexArray(p):
                 B[i] -= 0.5/pi*I(p[i].xc,p[i].yc,p[j],sin(p[i].beta),-cos(p[i].beta))
     return B
 
+# Forcing the Kutta Condition at trailing edge
+def kuttaArray(p):
+    N = len(p)
+    B = np.zeros(N+1,dtype=float)
+    for j in range(N):
+        if (j==0):
+            B[j] = 0.5/pi*I(p[N-1].xc,p[N-1].yc,p[j],-sin(p[N-1].beta),cos(p[N-1].beta))
+        elif (j==N-1):
+            B[j] = 0.5/pi*I(p[0].xc,p[0].yc,p[j],-sin(p[0].beta),cos(p[0].beta))
+        else:
+            B[j] = 0.5/pi*I(p[0].xc,p[0].yc,p[j],-sin(p[0].beta),cos(p[0].beta))+0.5/pi*I(p[N-1].xc,p[N-1].yc,p[j],-sin(p[N-1].beta),cos(p[N-1].beta))
+            B[N] -= 0.5/pi*I(p[0].xc,p[0].yc,p[j],cos(p[0].beta),sin(p[0].beta))+0.5/pi*I(p[N-1].xc,p[N-1].yc,p[j],cos(p[N-1].beta),sin(p[N-1].beta))
+    return B
+
 
 
 plt.show()
