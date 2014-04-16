@@ -114,8 +114,18 @@ def sourceMatrix(p):
     for i in range(N):
         for j in range(N):
             if (i!=j):
-                A[i,j]= 0.5/pi*I(p[i].xc,p[i].yc,p[j],+cos([p[i].beta),+sin(p[i].beta))
+                A[i,j]= 0.5/pi*I(p[i].xc,p[i].yc,p[j],+cos(p[i].beta),+sin(p[i].beta))
     return A
+
+# Defining the vortices on the panels
+def vortexArray(p):
+    N = len(p)
+    B = np.zeros(N,dtype=float)
+    for i in range(N):
+        for j in range(N):
+            if (j!=i):
+                B[i] -= 0.5/pi*I(p[i].xc,p[i].yc,p[j],sin(p[i].beta),-cos(p[i].beta))
+    return B
 
 
 
