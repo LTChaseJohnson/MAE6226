@@ -141,6 +141,24 @@ def kuttaArray(p):
             B[N] -= 0.5/pi*I(p[0].xc,p[0].yc,p[j],cos(p[0].beta),sin(p[0].beta))+0.5/pi*I(p[N-1].xc,p[N-1].yc,p[j],cos(p[N-1].beta),sin(p[N-1].beta))
     return B
 
+# Building the matrix based on Source array, Vortex array, and Kutta Condition
+def buildMatrix(panel):
+    N = len(panel)
+    A = np.empty((N+1,N+1),dtype=float)
+    AS = sourceMatrix(panel)
+    BV = vortexArray(panel)
+    BK = kuttaArray(panel)
+    A[0:N,0:N],A[0:N,N],A[N,:] = AS[:,:], BV[:], BK[:]
+    return A
+
+def buildRHS(p,fs):
+    N = len(p)
+    B = np.zeros(N+1,dtype=float)
+    for i in range(N):
+        B[i] = -fs.Uinf*cos(fs.alpha-p[i].beta)
+    B[N] = -fs.Uinf*(sin(fs.alpha-p[0].beta)+sin(fs.alpha-p[N-1].beta))
+    return B
+
 
 
 plt.show()
