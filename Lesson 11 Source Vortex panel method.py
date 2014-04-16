@@ -104,7 +104,7 @@ def I(xci,yci,pj,dxdz,dydz):
         return (+(xci-(pj.xa-sin(pj.beta)*s))*dxdz\
         +(yci-(pj.ya+cos(pj.beta)*s))*dydz)\
         /((xci-(pj.xa-sin(pj.beta)*s))**2)
-    return integrate.quad(lamda s:func(s),0.,pj.length)[0]
+    return integrate.quad(lambda s:func(s),0.,pj.length)[0]
 
 # Defining the sources on the panels
 def sourceMatrix(p):
@@ -191,6 +191,22 @@ def getPressureCoeff(p,fs):
         p[i].Cp = 1 - (p[i].vt/fs.Uinf)**2
 getPressureCoeff(panel,freestream)
 
-
+#Plotting the pressure coefficient
+valX,valY = 0.1,0.2
+xmin,xmax = min([p.xa for p in panel]),max([p.xa for p in panel])
+Cpmin,Cpmax = min([p.Cp for p in panel]),max([p.Cp for p in panel])
+xStart,xEnd = xmin-valX*(xmax-xmin),xmax+valX*(xmax-xmin)
+yStart,yEnd = Cpmin-valY*(Cpmax-Cpmin),Cpmax+valY*(Cpmax-Cpmin)
+plt.figure(figsize=(10,6))
+plt.grid(True)
+plt.xlabel('x',fontsize=16)
+plt.ylabel('y',fontsize=16)
+plt.plot([p.xc for p in panel if p.loc=='Top Surface'],[p.Cp for p in panel if p.loc=='Top Surface'],'ro-',linewidth=2)
+plt.plot([p.xc for p in panel if p.loc=='Bottom Surface'],[p.Cp for p in panel if p.loc=='Bottom Surface'],'bo-',linewidth=2)
+plt.legend(['Top Surface','Bottom Surface'],'best',prop={'size':14})
+plt.xlim(xStart,xEnd)
+plt.ylim(yStart,yEnd)
+plt.gca().invert_yaxis()
+plt.title('Number of panels: %d'%len(panel))
 
 plt.show()
