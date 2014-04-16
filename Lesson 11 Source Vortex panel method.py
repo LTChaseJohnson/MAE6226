@@ -5,7 +5,7 @@ from scipy import integrate
 from math import *
 
 # Defining our airfoil from imported geometry
-coords = np.loadtxt(fname='C:/Users/akashdhruv/Downloads/s1223.dat')
+coords = np.loadtxt(fname='C:/Users/chasevjohnson/Downloads/hq359.dat')
 xp,yp = coords[:,0],coords[:,1]
 
 # Creating our airfoil
@@ -96,14 +96,15 @@ class Freestream:
 
 Uinf = input('Enter freestream velocity: ')
 alpha = input('Enter angle of attack: ')
-freesream = Freestream(Uinf,alpha)
+freestream = Freestream(Uinf,alpha)
 
 # Creating integral function
 def I(xci,yci,pj,dxdz,dydz):
     def func(s):
         return (+(xci-(pj.xa-sin(pj.beta)*s))*dxdz\
         +(yci-(pj.ya+cos(pj.beta)*s))*dydz)\
-        /((xci-(pj.xa-sin(pj.beta)*s))**2)
+        /((xci-(pj.xa-sin(pj.beta)*s))**2\
+        + (yci-(pj.ya+cos(pj.beta)*s))**2)
     return integrate.quad(lambda s:func(s),0.,pj.length)[0]
 
 # Defining the sources on the panels
@@ -175,15 +176,15 @@ def getTangentVelocity(p,fs,gamma):
     for i in range(N):
         for j in range(N):
             if (i!=j):
-                A[i,j] = 0.5/pi*I(p[i].xc,p[i].yc,p[j],-sin(p[i].beta),cos(p[i].beta))
-                A[i,N] = 0.5/pi*I(p[i].xc,p[i].yc,p[j],cos(p[i].beta),sin(p[i].beta))
+                A[i,j] = 0.5/pi*I(p[i].xc,p[i].yc,p[j],-sin(p[i].beta),+cos(p[i].beta))
+                A[i,N] = 0.5/pi*I(p[i].xc,p[i].yc,p[j],cos(p[i].beta),+sin(p[i].beta))
     B = fs.Uinf*np.sin([fs.alpha-pp.beta for pp in p])
     var = np.empty(N+1,dtype=float)
     var = np.append([pp.sigma for pp in p],gamma)
     vt = np.dot(A,var)+B
     for i in range(N):
         p[i].vt=vt[i]
-getTangetVelocity(panel,freestream,gamma)
+getTangentVelocity(panel,freestream,gamma)
 
 #Defining pressure coefficient based on tangent velocity
 def getPressureCoeff(p,fs):
@@ -208,5 +209,37 @@ plt.xlim(xStart,xEnd)
 plt.ylim(yStart,yEnd)
 plt.gca().invert_yaxis()
 plt.title('Number of panels: %d'%len(panel))
+
+#Using superposition principle for velocity field
+def getVelocityField(panel,freestream,X,Y):
+    Nx,N = X.shape
+    u,v = np.empty((Nx,Ny),dtype=float),np.empty((Nx,Ny),dtype=float)
+    for i in range(Nx):
+        for j in range(Ny):
+            u[i,j] = freestream.Uinf*cos(freestream.alpha)+0.5/pi*sum([p.sigma*I(X[i,j],Y[i,j],p,1,0) for p in panel])
+            v[i,j] = freestream.Uinf*sin(freestream.alpha)+0.5/pi*sum([p.sigma*I(X[i,j],Y[i,j],p,0,1) for p in panel])
+    return u,v
+
+Nx,Ny = 20,20
+valX,valY = 1.0,2.0
+xmin,xmax = min([p.xa for p in panel]),max([p.xa for p in panel])
+ymin,ymax = min([p.ya for p in panel]),max([p.ya for p in panel])
+xStart,xEnd = xmin-valX*(xmax-xmin),xmax+valX*(xmax-xmin)
+yStart,yEnd = ymin-valY*(ymax-ymin),ymax+valY*(ymax-ymin)
+X,Y = np.meshgrid(np.linspace(xStart,xEnd,Nx),np.linspace(yStart,yEnd,Ny))
+
+u,v = getVelocityField(panel,freestream,X,Y)
+
+#Plotting Velocity Field
+size = 12
+plt.figure(figsize=(size,(yEnd-yStart)/(xEnd-xStart)*size))
+plt.xlabel('x',fontsize=16)
+plt.ylabel('y',fontsize=16)
+plt.streamplot(X,Y,u,v,density=4,linewidth=1,arrowsize=1,arrowstyle='->')
+plt.fill([p.xa for p in panel],[p.ya for p in panel], 'ko-', linewidth=2,zorder=2)
+plt.xlim(xStart,xEnd)
+plt.ylim(yStart,yEnd)
+plt.title('Contour of velocity field')
+plt.axis("equal")
 
 plt.show()
