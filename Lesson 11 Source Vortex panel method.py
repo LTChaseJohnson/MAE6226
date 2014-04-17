@@ -5,7 +5,7 @@ from scipy import integrate
 from math import *
 
 # Defining our airfoil from imported geometry
-coords = np.loadtxt(fname='C:/Users/chasevjohnson/Downloads/hq359.dat')
+coords = np.loadtxt(fname='C:/Users/chasevjohnson/Downloads/n0012.dat')
 xp,yp = coords[:,0],coords[:,1]
 
 # Creating our airfoil
@@ -220,7 +220,7 @@ def getVelocityField(panel,freestream,X,Y):
             v[i,j] = freestream.Uinf*sin(freestream.alpha)+0.5/pi*sum([p.sigma*I(X[i,j],Y[i,j],p,0,1) for p in panel])
     return u,v
 
-Nx,Ny = 80,80
+Nx,Ny = 20,20
 valX,valY = 1.0,2.0
 xmin,xmax = min([p.xa for p in panel]),max([p.xa for p in panel])
 ymin,ymax = min([p.ya for p in panel]),max([p.ya for p in panel])
@@ -257,5 +257,8 @@ plt.xlim(xStart,xEnd)
 plt.ylim(yStart,yEnd)
 plt.title('Contour of Pressure Field')
 plt.axis("equal")
+
+print 'Sum of Source/Sink Strengths: ',sum([p.sigma*p.length for p in panel])
+print 'Lift Coefficient: ',gamma*sum([p.length for p in panel])/(0.5*freestream.Uinf*(xmax-xmin))
 
 plt.show()
