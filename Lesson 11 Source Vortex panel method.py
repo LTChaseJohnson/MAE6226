@@ -220,7 +220,7 @@ def getVelocityField(panel,freestream,X,Y):
             v[i,j] = freestream.Uinf*sin(freestream.alpha)+0.5/pi*sum([p.sigma*I(X[i,j],Y[i,j],p,0,1) for p in panel])-0.5*gamma/pi*sum([I(X[i,j],Y[i,j],p,1,0) for p in panel])
     return u,v
 
-Nx,Ny = 50,50
+Nx,Ny = 100,100
 valX,valY = 1.0,2.0
 xmin,xmax = min([p.xa for p in panel]),max([p.xa for p in panel])
 ymin,ymax = min([p.ya for p in panel]),max([p.ya for p in panel])
