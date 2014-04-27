@@ -5,7 +5,7 @@ from scipy import integrate
 from math import *
 
 # Defining our airfoil from imported geometry
-coords = np.loadtxt(fname='C:/Users/chasevjohnson/Dropbox/Graduate_School/AeroDynamics/Python/s9000.dat')
+coords = np.loadtxt(fname='C:/Users/chasevjohnson/Dropbox/Graduate_School/AeroDynamics/Python/n43012a.dat')
 xp,yp = coords[:,0],coords[:,1]
 
 # Creating our airfoil
@@ -72,7 +72,6 @@ def definePanels(N,xp,yp):
 
 N = input('Enter number of panels: ')
 panel = definePanels(N,xp,yp)
-
 valX,valY =0.1,0.2
 xmin,xmax = min([p.xa for p in panel]),max([p.xa for p in panel])
 ymin,ymax = min([p.ya for p in panel]),max([p.ya for p in panel])
@@ -87,7 +86,7 @@ plt.xlim(xStart,xEnd)
 plt.ylim(yStart,yEnd)
 plt.plot(xp,yp,'k-',linewidth=2)
 plt.plot(np.append([p.xa for p in panel],panel[0].xa),np.append([p.ya for p in panel],panel[0].ya),'r-',linewidth=1,marker='o',markersize=6)
-
+'''
 # Creating Freestream Conditions
 class Freestream:
     def __init__(self,Uinf,alpha):
@@ -259,6 +258,6 @@ plt.title('Contour of Pressure Field')
 plt.axis("equal")
 
 print 'Sum of Source/Sink Strengths: ',sum([p.sigma*p.length for p in panel])
-print 'Lift Coefficient: ',gamma*sum([p.length for p in panel])/(0.5*freestream.Uinf*(xmax-xmin))
+print 'Lift Coefficient: ',gamma*sum([p.length for p in panel])/(0.5*freestream.Uinf*(xmax-xmin))'''
 
 plt.show()
