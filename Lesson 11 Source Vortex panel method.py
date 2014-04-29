@@ -5,7 +5,7 @@ from scipy import integrate
 from math import *
 
 # Defining our airfoil from imported geometry
-coords = np.loadtxt(fname='C:/Users/chasevjohnson/Dropbox/Graduate_School/AeroDynamics/Python/n43012a.dat')
+coords = np.loadtxt(fname='C:/Users/chasevjohnson/Dropbox/Graduate_School/AeroDynamics/Python/falcon.dat')
 xp,yp = coords[:,0],coords[:,1]
 
 # Creating our airfoil
